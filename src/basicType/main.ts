@@ -55,10 +55,10 @@ enum Color { Red, Blue, Green }
 let c: Color = Color.Green
 // console.info(Color) // 0, 1, 2
 
-enum Color2 {Red = 1, Blue, Green}
+enum Color2 { Red = 1, Blue, Green }
 // console.info(Color2) // 1, 2, 3
 
-enum Color3 {Red, Blue = 5, Green}
+enum Color3 { Red, Blue = 5, Green }
 // console.info(Color3) // 0, 5, 6
 
 // todo Any类型
@@ -106,7 +106,7 @@ let stringLength2: number = (someValue as string).length // ? 断言的另一种
 // ? let 和 const 都是块级作用域，let声明的变量可以修改，const声明的变量外部不能修改，内部可以修改
 
 // todo 解构
-// ? 1. 解构数组
+// * 1. 解构数组
 const input = [1, 2]
 const [first, second] = input
 console.info(first, second) // 1, 2
@@ -114,12 +114,51 @@ console.info(first, second) // 1, 2
 let [one, ...rest] = [1, 2, 3, 4]
 console.info(one, rest) // 1  [2, 3, 4]
 
-// ? 解构对象
+// * 2. 解构对象
 let o = {
     a: "foo",
     b: 12,
     c: false
 }
-let {a, b} = o
-let {c, ...}
+// let { a, b } = o
+let { a, ...passthrough } = o
 
+// ? 如果不想定义重名的变量可以如下定义
+let { a: newName1, b: newName2 } = o // 类似 let newName1 = o.a, newName2 = o.b
+
+// ? 如果需要给指定变量名类型，则定义如下
+let { a: name1, b: name2 }: { a: string, b: number } = o
+
+// ? 默认值， 即当属性为undefined时赋值可以根据设置的默认值
+function keepWholeObject(wholeObject: { a: string, b?: number }) {
+    // ? 传入的对象中b的值为可选，可能为undefined
+    let { a, b = 1000 } = wholeObject
+}
+
+// * 3. 函数声明
+type C = { a: string, b?: number }
+function f({ a, b }: C): void { }
+
+
+// ? 
+function f2({ a, b = 0 } = { a: "" }): void { }
+f2({ a: 'yes' })
+f2()
+// f2({}) // ! 错误 因为该函数调用时可以不传属性b，可以传空，但是不能传空对象{}
+
+// * 4. 展开
+// ? 将一个数组展开为另一个数组或者一个对象
+const firstArr = [1, 2]
+let secondArr = [3, 4]
+let bothPlus = [0, ...firstArr, ...secondArr, 5]
+// console.info(bothPlus) // [1, 2, 3, 4, 5]
+secondArr = [7, 8, 9]
+// console.info(bothPlus) // [1, 2,3, 4, 5]
+// ? 改变secondArr 的值不会使得bothPlus变化
+
+// ? 对象展开
+let defaults = { food: 'spicy', price: '$$', ambiance: 'noisy' }
+let search = { ...defaults, food: 'rich' } //{ food: "rich", price: "$$", ambiance: "noisy" }
+// console.info(search) // ? 后面会覆盖前面的属性
+search = { food: 'rich', ...defaults }
+// console.info(search) // { food: "spicy", price: "$$", ambiance: "noisy" }
