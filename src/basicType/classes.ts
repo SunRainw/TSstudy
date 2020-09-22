@@ -112,7 +112,7 @@ class Person {
 
 class Employees extends Person {
     private department: string
-    constructor(name: string, department: string){
+    constructor(name: string, department: string) {
         super(name)
         this.department = department
     }
@@ -137,7 +137,7 @@ class Person2 {
 }
 class Employees2 extends Person2 {
     private department: string
-    constructor(name: string, department: string){
+    constructor(name: string, department: string) {
         super(name)
         this.department = department
     }
@@ -159,12 +159,13 @@ class Octopus {
         console.info(this.name, this.h, this.e)
     }
 }
-let dad = new Octopus("呵呵","哈哈", "ss")
+let dad = new Octopus("呵呵", "哈哈", "ss")
 
 // todo 存取器
 // ? TS通过getters/setters来截取对对象成员的访问
 // ? 如果只有getter没有setter即为只读
 
+// ? 存取器的好处在于条件读取
 let passcode = "secret"
 class Employer {
     private _fullName: string
@@ -173,7 +174,7 @@ class Employer {
     }
 
     set fullName(newName: string) {
-        if(passcode && passcode === "secret") {
+        if (passcode && passcode === "secret") {
             this._fullName = newName
         } else {
             console.info("Error: Unauthorized update of employee!")
@@ -186,3 +187,53 @@ employer.fullName = "Bob Smith"
 if (employer.fullName) {
     console.info(employer.fullName)
 }
+
+// todo 静态属性
+// ? 类的静态属性存在于类本身上面而不是类的实例上，需要通过statice定义，通过类名直接访问
+class Grid {
+    static origin = { x: 0, y: 0 }
+    calculateDistanceFromOrigin(point: { x: number, y: number }) {
+        let xDist = (point.x - Grid.origin.x)
+        let yDist = point.y - Grid.origin.y
+        return Math.sqrt(xDist * xDist + yDist * yDist) / this.scale
+    }
+    constructor(public scale: number) {
+
+    }
+}
+
+let grid1 = new Grid(1.0)
+let grid2 = new Grid(5.0)
+
+// todo 抽象类(abstract)
+abstract class Department {
+    constructor(public name: string) {
+
+    }
+    printName(): void {
+        console.info("Department name: " + this.name)
+    }
+    abstract printMeeting(): void // 必须在派生类中实现
+}
+
+class AccountingDepartment extends Department {
+    constructor() {
+        super("Accounting and Auditing")
+    }
+
+    printMeeting(): void {
+        console.info("The Accounting Department meets each Monday at 10am")
+    }
+    generateReports(): void {
+        console.info("Generating accounting reports...")
+    }
+}
+
+let department: Department // ? 允许创建一个对象抽象类型的引用
+// department = new Department() // ! 不能创建一个抽象类的实例
+department = new AccountingDepartment()
+department.printName()
+department.printMeeting()
+// department.generateReports() // ! 方法在声明的抽象类中不存在
+
+
