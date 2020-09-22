@@ -74,3 +74,115 @@ let myArray: StringArray
 myArray = ["Bob", "Fred"]
 
 let myStr: string = myArray[0]
+
+// todo 类类型的接口
+// ? 接口描述了类的公共部分，但没有检查类的私有成员
+interface ClockInteface {
+    currentTime: Date
+    setTime(d: Date)
+}
+
+class Clock implements ClockInteface {
+    currentTime: Date
+    setTime(d: Date) {
+        this.currentTime = d
+    }
+    constructor(h: number, m: number) {}
+}
+
+// * 类静态部分与实例部分的区别
+// ? 类具有两个类型： 静态部分的类型和实例的类型
+// ? 当类实现一个接口时，只对其实例部分进行类型检查。而constructor存在于类的静态部分
+// interface ClockConstructor {
+//     new (hour: number, minute: number)
+// }
+// class Clock1 implements ClockConstructor {
+//     currentTime: Date
+//     constructor(h: number, m: number)
+// }
+
+interface ClockConstructor {
+    new(hour: number, minute: number): ClockInteface1
+}
+interface ClockInteface1 {
+    tick()
+}
+
+function createClock(ctor: ClockConstructor, hour: number, minute: number): ClockInteface1 {
+    return new ctor(hour, minute)
+}
+
+class DigitalClock implements ClockInteface1 {
+    constructor(h: number, m: number) {}
+    tick() {
+        console.info("beep beep")
+    }
+}
+
+class AnalogClock implements ClockInteface1 {
+    constructor(h: number, m: number) {}
+    tick() {
+        console.log("tick tick")
+    }
+}
+
+let digital = createClock(DigitalClock, 12, 17)
+let analog = createClock(AnalogClock, 7, 32)
+
+// todo 继承接口
+interface Shape {
+    color: string
+}
+
+interface Square extends Shape {
+    sideLength: number
+}
+
+// let square: Square = {}
+let square = <Square>{}
+square.color = "blue"
+square.sideLength = 10
+
+// ? 一个接口可以继承多个接口，创建出多个接口的合成接口
+interface PenStroke {
+    penWidth: number
+}
+
+interface Square extends Shape, PenStroke {
+    sideLength: number
+}
+
+// todo 混合类型的接口
+interface Counter {
+    (start: number): string
+    interval: number
+    reset(): void
+}
+
+function getCounter(): Counter {
+    let counter = <Counter>function (start: number) {}
+    counter.interval = 123
+    counter.reset = function () {}
+    return counter
+}
+
+let c1 = getCounter()
+c1(10)
+c1.reset()
+c1.interval = 5.0
+
+// todo 接口继承类
+// ? 接口继承类，会继承类的成员但不包括实现，接口同样会继承累的private和protected成员，
+// ? 而如果该类有私有或保护成员时，该接口也只能被该类和其子类所实现
+class Control {
+    private state: any
+}
+// 接口继承了类
+interface SelectableControl extends Control {
+    select(): void
+}
+// 该类的子类可以实现该接口
+class Button extends Control implements SelectableControl {
+    select() {}
+}
+
