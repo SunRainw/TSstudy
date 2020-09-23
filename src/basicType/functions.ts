@@ -34,4 +34,31 @@ let results1 = buildName(undefined, "Tom")
 
 // todo 剩余参数
 
+// todo 重载
+// ? 重载即函数名不变，参数不同返回的类型可能不能
+let suits = ["hearts", "spades", "clubs", "diamonds"];
+
+function pickCard(x: { suit: string; card: number }[]): number
+function pickCard(x: number): { suit: string; card: number }
+function pickCard(x): any {
+    if (typeof x === "object") {
+        let pickedCard = Math.floor(Math.random() * x.length)
+        return pickedCard
+    } else if (typeof x === "number") {
+        let pickedSuit = Math.floor(x / 13)
+        return { suit: suits[pickedSuit], card: x % 13 }
+    }
+}
+// ? TypeScript可以通过重载识别可传入的参数
+// let myDeck = pickCard(["haha"]) // ! 错误
+let myDeck = [{ suit: "diamonds", card: 2 }, { suit: "spades", card: 10 }, { suit: "hearts", card: 4 }];
+let pickedCard1 = myDeck[pickCard(myDeck)];
+alert("card: " + pickedCard1.card + " of " + pickedCard1.suit);
+
+let pickedCard2 = pickCard(15);
+alert("card: " + pickedCard2.card + " of " + pickedCard2.suit);
+
+
+
+
 
