@@ -33,7 +33,62 @@ function buildName2(firstName = "Will", lastName: string) {
 let results1 = buildName(undefined, "Tom")
 
 // todo 剩余参数
+// ? 使用（...）加变量名把剩余的参数收集到变量里面
+function buildName3(firstName: string, ...restOfName: string[]) {
+    return firstName + " " + restOfName.join(" ");
+}
 
+let employeeName = buildName3("Joseph", "Samuel", "Lucas", "Mackinzie")
+let buildNameFun: (fname: string, ...rest: string[]) => string = buildName3
+
+// todo this
+// ? 使用箭头函数保存函数创建时的this值，但是TypeScript依然会把this标记为any，只能通过提供显式的this参数
+let deck = {
+    suits: ["hearts", "spades", "clubs", "diamonds"],
+    cards: Array(52),
+    createCardPicker: function () {
+        // NOTE: the line below is now an arrow function, allowing us to capture 'this' right here
+        return () => {
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+
+            return { suit: this.suits[pickedSuit], card: pickedCard % 13 };
+        }
+    }
+}
+
+let cardPicker = deck.createCardPicker();
+let pickedCard = cardPicker();
+
+console.info("card: " + pickedCard.card + " of " + pickedCard.suit);
+
+// ? 显式this🌰
+interface Card {
+    suit: string
+    card: number
+}
+
+interface Deck {
+    suits: string[]
+    cards: number[]
+    createCardPicker(this: Deck): () => Card
+}
+
+let newDeck: Deck = {
+    suits: ["hearts", "spades", "clubs", "diamonds"],
+    cards: Array(52),
+    createCardPicker: function (this: Deck) {
+        return () => {
+            let pickedCard = Math.floor(Math.random() * 52);
+            let pickedSuit = Math.floor(pickedCard / 13);
+            return { suit: this.suits[pickedSuit], card: pickedCard % 13 };
+        }
+    }
+}
+
+let cardPicker2 = newDeck.createCardPicker()
+let pickedCard2 = cardPicker2()
+console.info("card: " + pickedCard.card + " of " + pickedCard.suit)
 // todo 重载
 // ? 重载即函数名不变，参数不同返回的类型可能不能
 let suits = ["hearts", "spades", "clubs", "diamonds"];
@@ -55,8 +110,8 @@ let myDeck = [{ suit: "diamonds", card: 2 }, { suit: "spades", card: 10 }, { sui
 let pickedCard1 = myDeck[pickCard(myDeck)];
 alert("card: " + pickedCard1.card + " of " + pickedCard1.suit);
 
-let pickedCard2 = pickCard(15);
-alert("card: " + pickedCard2.card + " of " + pickedCard2.suit);
+let pickedCard3 = pickCard(15);
+alert("card: " + pickedCard3.card + " of " + pickedCard3.suit);
 
 
 
