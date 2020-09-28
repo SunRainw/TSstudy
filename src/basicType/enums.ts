@@ -1,11 +1,11 @@
 
 // todo 枚举
-function getSomeValue<T>(num: T): T{
+function getSomeValue<T>(num: T): T {
     return num
 }
 // ? 枚举可以被混入到计算过的和常量成员
 // ? 但是不能放在不带初始化的枚举的第一个位置，
-enum E { 
+enum E {
     B,
     A = getSomeValue(1),
 }
@@ -49,9 +49,9 @@ enum E3 {
 enum FileAccess {
     // constant members
     None,
-    Read    = 1 << 1,
-    Write   = 1 << 2,
-    ReadWrite  = Read | Write,
+    Read = 1 << 1,
+    Write = 1 << 2,
+    ReadWrite = Read | Write,
     // computed member
     G = "123".length
 }
@@ -76,8 +76,35 @@ interface Square {
     sideLength: number
 }
 
-let cm:Circle = {
+let cm: Circle = {
     // kind: ShapeKind.Square, // ! 错误，此时ShapeKind.Square为类型
     kind: 2,
     radius: 100
 }
+
+// todo 反向映射
+// ? 反向映射即从枚举值到枚举名字
+enum Enum {
+    A
+}
+
+let h = Enum.A
+let nameOfA = Enum[h]
+
+// todo const 枚举（常量枚举）
+// ? 常量枚举只能使用常量枚举表达式，并且会在编译阶段被删除
+// ? 由于常量枚举不允许包含计算成员，所以在使用的地方会被内联进来
+const enum Enum2 {
+    A = 1,
+    B = A * 2
+}
+
+// todo 外部枚举
+// ? 外部枚举用来描述已经存在着的枚举类型的形状
+// ! 如何理解外部枚举
+declare enum Enum3 {
+    A = 1, B, C = 2
+}
+// ? 外部枚举和非外部枚举的区别: 在正常的枚举里，没有初始化方法的成员被当成常数成员。
+// ? 对于非常数的外部枚举而言，没有初始化方法被当作需要经过计算的
+
