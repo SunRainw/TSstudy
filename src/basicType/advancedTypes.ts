@@ -1,23 +1,62 @@
+
+// todo 高级类型
+// todo 交叉类型（Intersection Types）
+function extend<T, U>(first: T, second: U): T & U {
+    // ? result 拥有T和U两种类型的成员
+    let result = <T & U>{}
+    for (let id in first) {
+        (<unknown>result)[id] = (<unknown>first)[id]
+    }
+    for (let id in second) {
+        // ? hasOwnProperty: 指示对象自身属性中是否具有指定的属性
+        if (!result.hasOwnProperty(id)) {
+            (<unknown>result)[id] = (<unknown>second)[id]
+        }
+    }
+    return result
+}
+class Personp {
+    constructor(public name: string) { }
+}
+interface Loggable {
+    log(): void
+}
+class ConsoleLogger implements Loggable {
+    log() { }
+}
+
+let jim = extend(new Personp("Jim"), new ConsoleLogger())
+const namep = jim.name
+jim.log()
+
+// todo 联合类型
+// ? 使用竖线(|)分割每个类型，表示其中一种类型
+function padLeft1(value: string, padding: string | number) {
+
+}
+
+// ? 如果一个值是联合类型，我们只能访问此联合类型的所有类型里共有的成员
 interface Bird {
-    fly();
-    layEggs();
+    fly()
+    layEggs()
 }
 
 interface Fish {
-    swim();
-    layEggs();
+    swim()
+    layEggs()
 }
 class Zoo implements Bird {
     fly() { }
     layEggs() { }
 }
 function getSmallPet(): Fish | Bird {
+
     return new Zoo
 }
-
 let pet1 = getSmallPet();
 pet1.layEggs(); // okay
-// pet1.swim();    // errors
+// pet.fly(); // 不行，只能使用共有成员
+
 // todo  类型保护与区分类别
 let pet2 = getSmallPet()
 // ? 使用类型断言
@@ -217,11 +256,112 @@ function getProperty<T, K extends keyof T>(o: T, name: K): T[K] {
 }
 let namef: string = getProperty(personm, 'name');
 let age: number = getProperty(personm, 'age');
-let unknown = getProperty(personm, 'unknown');
+// let unknown = getProperty(personm, 'unknown'); // !  错误的，只能是name和 age
 
 // todo 索引类型和字符串索引签名
 interface Map<T> {
     [key: string]: T
 }
-let keys: keyof Map<number>
-let value: Map<number>['foo']
+let keys: keyof Map<number> // string
+let value: Map<number>['foo'] // number
+
+// todo 映射类型
+type ReadonlyNew<T> = {
+    readonly [P in keyof T]: T[P]
+}
+type PartialNew<T> = {
+    [P in keyof T]?: T[P]
+}
+
+type PersonPartial = PartialNew<Personm>
+type ReadonlyPerson = ReadonlyNew<Personm>
+
+type Keys = 'option1' | 'option2'
+type Flags = { [K in Keys]: boolean }
+
+/**
+ * 1. 类型变量K，他会依次绑定到每个属性
+ * 2. 字符串字面量联合的Keys，它包含了要迭代的属性名的集合
+ * 3. 属性的结果类型
+ */
+
+type NullablePerson = { [P in keyof Personm]: Personm[P] | null }
+type PartialPerson = { [P in keyof Person]?: Person[P] }
+
+// ? 属性列表是keyof T 且结果类型是T[P]的变体，这类转换是同态的
+// ? Readonly, Partial，Pick是同态的，而Record不是，因为Record并不需要输入类型来拷贝属性
+
+type Proxy<T> = {
+    get(): T
+    set(value: T): void
+}
+type Proxify<T> = {
+    [P in keyof T]: Proxy<T[P]>
+}
+
+function proxify<T>(o: T): Proxify<T> {
+    return
+}
+
+type PickNew<T, K extends keyof T> = {
+    [P in K]: T[P]
+}
+
+type RecordNew<K extends string, T> = {
+    [P in K]: T
+}
+
+type ThreeStringProps = RecordNew<'prop1' | 'prop2' | 'prop3', string>
+
+// todo 由映射类型进行推断
+// ? 同态的映射类型，可以使用拆包推断，如果映射类型不是同态的，需要给拆包函数一个明确的类型参数
+function unproxify<T>(t: Proxify<T>): T {
+    let result = {} as T
+    for (const k in t) {
+        result[k] = t[k].get()
+    }
+    return result
+}
+
+// todo 预定义的有条件类型
+/**
+ * Exclude<T, U> -- 从T中剔除可以赋值给U的类型
+ * Extract<T, U> -- 提取T中可以赋值给U的类型
+ * NonNullable<T> -- 从T中剔除null和undefined
+ * ReturnType<T> -- 获取函数返回值类型
+ * Instance<T> -- 获取构造函数类型的实例类型
+ */
+
+type T00 = Exclude<'a' | 'b' | 'c' | 'd', 'a' | 'c' | 'f'> // 'b' | 'd'
+type T01 = Extract<'a' | 'b' | 'c' | 'd', 'a' | 'c' | 'f'> // 'a' | 'c'
+
+type T02 = Exclude<string | number | (() => void), Function> // string | number
+type T03 = Extract<string | number | (() => void), Function> // () => void
+
+type T04 = NonNullable<string | number | undefined>;  // string | number
+type T05 = NonNullable<(() => string) | string[] | null | undefined>;  // (() => string) | string[]
+
+function f1(s: string) {
+    return { a: 1, b: s };
+}
+
+class C1 {
+    x = 0;
+    y = 0;
+}
+
+type T10 = ReturnType<() => string>;  // string
+type T11 = ReturnType<(s: string) => void>;  // void
+type T12 = ReturnType<(<T>() => T)>;  // {}
+type T13 = ReturnType<(<T extends U, U extends number[]>() => T)>;  // number[]
+type T14 = ReturnType<typeof f1>;  // { a: number, b: string }
+type T15 = ReturnType<any>;  // any
+type T16 = ReturnType<never>;  // any
+// type T17 = ReturnType<string>;  // Error
+// type T18 = ReturnType<Function>;  // Error
+
+type T20 = InstanceType<typeof C1>;  // C1
+type T21 = InstanceType<any>;  // any
+type T22 = InstanceType<never>;  // any
+// type T23 = InstanceType<string>;  // Error
+// type T24 = InstanceType<Function>;  // Error
