@@ -100,3 +100,28 @@ declare module "path" {
 
 import * as URL from "url";
 let myUrl = URL.parse("http://www.typescriptlang.org");
+
+// todo 模块声明通配符
+// ? 某些模块加载器如SystemJS和AMD支持导入非JavaScript内容。通常会使用一个前缀或后缀来表示特殊的加载语法。
+declare module "*!text" {
+    const content: string
+    export default content
+}
+
+declare module "json!*" {
+    const value: any
+    export default value
+}
+
+// 导入匹配"*!text"或"json!*"的内容
+import fileContent from "./xyz.txt!text"
+import data from "json!http://example.com/data.json"
+console.log(data, fileContent)
+
+// todo 创建模块结构指导
+// ? 如果仅导出单个class或function，使用export default
+// ? 如果导出多个对象，把他们放在顶层导出
+// ? 明确地列出导入的名字
+// ? 使用命名空间导入模式当你要导出大量内容的时候
+// ? 使用重新导出进行扩展
+// ? 模块里不要使用命名空间
