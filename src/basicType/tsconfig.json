@@ -7,7 +7,7 @@
         // "target": "es5", // 目标语言的版本
         // "module": "commonjs", // 生成代码的模块标准
         // "outFile": "./app.js", // 将多个相互依赖的文件生成一个文件，可以用在 AMD 模块中
-
+        "jsx": "preserve",
         "lib": ["dom", "es5", "es2015" ], // TS 需要引用的库，即声明文件，es5 默认 "dom", "es5", "scripthost"
 
         // "allowJs": true, // 允许编译 JS 文件（js、jsx）
@@ -50,7 +50,7 @@
 
         // "esModuleInterop": true, // 允许 export = 导出，由import from 导入
         // "allowUmdGlobalAccess": true, // 允许在模块中访问 UMD 全局变量
-        // "moduleResolution": "node", // 模块解析策略
+        // "moduleResolution": "node", // 模块解析策略 // ? 若未指定，那么在使用了 --module AMD | System | ES2015时的默认值为Classic，其它情况时则为Node。
         // "baseUrl": "./", // 解析非相对模块的基地址
         // "paths": { // 路径映射，相对于 baseUrl
         //     "jquery": ["node_modules/jquery/dist/jquery.slim.min.js"]
@@ -61,3 +61,11 @@
         // "listFiles": true, // 打印编译的文件（包括引用的声明文件）
     }
 }
+
+// --noResolve选项告诉编译器不要添加任何不是在命令行上传入的文件到编译列表
+/*
+tsc app.ts moduleA.ts --noResolve
+使用--noResolve编译app.ts
+1. 可能正确找到moduleA，因为它在命令行上指定了
+2. 找不到moduleB，因为没有在命令行上传递
+*/
