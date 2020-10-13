@@ -4,7 +4,8 @@
         // "tsBuildInfoFile": "./buildFile", // 增量编译文件的存储位置
         // "diagnostics": true, // 打印编译信息
 
-        // "target": "es5", // 目标语言的版本
+        "target": "es5", // 目标语言的版本
+        "experimentalDecorators": true, // 启用装饰器
         // "module": "commonjs", // 生成代码的模块标准
         // "outFile": "./app.js", // 将多个相互依赖的文件生成一个文件，可以用在 AMD 模块中
         "jsx": "preserve",

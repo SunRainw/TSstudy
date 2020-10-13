@@ -81,3 +81,55 @@ declare namespace JSX {
 }
 
 <foo bar />
+
+// ? 基于值得元素取决于先前确定的在元素实例类型上的某个属性的类型
+declare namespace JSX {
+    interface ElementAttributesProperty {
+        props // 指定用来使用的属性名
+    }
+}
+
+class MyComponent3 {
+    props: {
+        foo?: string
+    }
+}
+
+<MyComponent3 foo="bar" />
+
+// todo 子孙类型检查
+// ? children是元素属性类型的一个特殊属性，子JSXExpression将会被插入到属性里
+declare namespace JSX {
+    interface ElementChildrenAttribute {
+        children: {}
+    }
+}
+
+// 如果不特殊指定子孙的类型，将使用React typings里的默认类型
+{/* <div>
+    <h1>hello</h1>
+</div> */}
+
+// const CustomComp = (props) => <div>props.children</div>
+
+<div>
+    <CustomComp>
+        <div>Hello World</div>
+        {"This is just a JS expression" + 1000}
+    </CustomComp>
+</div>
+
+// todo 嵌入的表达式
+var a5 = <div>
+    {['foo', 'bar'].map(i => <span>{i / 2}</span>)}
+</div>
+
+// todo React整合
+interface Props {
+    foo: string
+}
+class MyComponent4 extends RTCIceCandidate.Component<Props, {}> {
+    render () {
+    return <span>{this.props.foo}</span>
+    }
+}
